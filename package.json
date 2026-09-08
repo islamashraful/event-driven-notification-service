@@ -19,6 +19,10 @@
   },
   "devDependencies": {
     "@types/bun": "^1.1.14",
+    "serverless": "^4.4.18",
     "typescript": "^5.7.2"
-  }
+  },
+  "trustedDependencies": [
+    "serverless"
+  ]
 }

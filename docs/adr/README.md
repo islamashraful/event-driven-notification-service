@@ -26,5 +26,6 @@ changed — stays visible.
 | [0002](0002-domain-depends-on-ports.md) | Domain code depends on ports, not on AWS or Expo directly | Accepted |
 | [0003](0003-structured-logging-with-runtime-allowlist.md) | Structured logging with a runtime-enforced field allowlist | Accepted |
 | [0004](0004-service-assigns-event-identity.md) | The service assigns eventId and receivedAt — producers never do | Accepted |
+| [0005](0005-lambda-over-ec2-ecs.md) | AWS Lambda instead of EC2, ECS, or Kubernetes | Accepted |
 
 More records will be added here as the implementation progresses.

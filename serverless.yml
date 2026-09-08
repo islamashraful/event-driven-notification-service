@@ -1,3 +1,8 @@
-# Infrastructure definition — populated as the build progresses.
-
 service: event-driven-notification-service
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  region: ${opt:region, 'eu-central-1'}
+  stage: ${opt:stage, 'dev'}
+  logRetentionInDays: 14
