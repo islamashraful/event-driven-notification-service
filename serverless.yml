@@ -6,3 +6,25 @@ provider:
   region: ${opt:region, 'eu-central-1'}
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 14
+
+resources:
+  Resources:
+    # Catches messages the worker keeps failing to process (see ADR 0001
+    # and 0006) so they can be inspected instead of retried forever.
+    NotificationsDLQ:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-${sls:stage}-notifications-dlq
+
+    # The queue that decouples receiving an event from actually sending
+    # the notification (see ADR 0006). VisibilityTimeout is set well
+    # above the worker Lambda's own timeout, once that's defined, so a
+    # message can't be picked up twice while still being processed.
+    NotificationsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-${sls:stage}-notifications
+        VisibilityTimeout: 60
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt NotificationsDLQ.Arn
+          maxReceiveCount: 3
