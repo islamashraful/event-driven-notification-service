@@ -1,0 +1,11 @@
+CLAUDE.local.md
+
+node_modules/
+.serverless/
+.build/
+dist/
+coverage/
+.env
+.env.local
+*.log
+.DS_Store

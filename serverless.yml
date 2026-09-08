@@ -1,0 +1,3 @@
+# Infrastructure definition — populated as the build progresses.
+
+service: event-driven-notification-service

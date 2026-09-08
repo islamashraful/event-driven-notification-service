@@ -1,0 +1,20 @@
+{
+  "name": "event-driven-notification-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-style push notification service built with TypeScript, AWS Lambda, SQS, DynamoDB, and EventBridge. Demonstrates architectural tradeoffs, failure handling, observability, and infrastructure as code.",
+  "author": "Ashraful Islam",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "bun@1.3.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
