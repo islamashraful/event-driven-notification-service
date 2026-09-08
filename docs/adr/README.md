@@ -24,5 +24,6 @@ changed — stays visible.
 |---|---|---|
 | [0001](0001-failure-classification.md) | Classify failures into retry, DLQ, or token-deactivation | Accepted |
 | [0002](0002-domain-depends-on-ports.md) | Domain code depends on ports, not on AWS or Expo directly | Accepted |
+| [0003](0003-structured-logging-with-runtime-allowlist.md) | Structured logging with a runtime-enforced field allowlist | Accepted |
 
 More records will be added here as the implementation progresses.
