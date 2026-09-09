@@ -29,5 +29,6 @@ changed — stays visible.
 | [0005](0005-lambda-over-ec2-ecs.md) | AWS Lambda instead of EC2, ECS, or Kubernetes | Accepted |
 | [0006](0006-sqs-standard-over-fifo-decoupling.md) | SQS as the decoupling boundary, and Standard over FIFO | Accepted |
 | [0007](0007-dynamodb-single-table-on-demand.md) | A single DynamoDB table, keyed by userId, on on-demand billing | Accepted |
+| [0008](0008-expo-error-mapping-defaults-to-retryable.md) | Unrecognized Expo push errors default to retryable | Accepted |
 
 More records will be added here as the implementation progresses.
