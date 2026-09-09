@@ -28,5 +28,6 @@ changed — stays visible.
 | [0004](0004-service-assigns-event-identity.md) | The service assigns eventId and receivedAt — producers never do | Accepted |
 | [0005](0005-lambda-over-ec2-ecs.md) | AWS Lambda instead of EC2, ECS, or Kubernetes | Accepted |
 | [0006](0006-sqs-standard-over-fifo-decoupling.md) | SQS as the decoupling boundary, and Standard over FIFO | Accepted |
+| [0007](0007-dynamodb-single-table-on-demand.md) | A single DynamoDB table, keyed by userId, on on-demand billing | Accepted |
 
 More records will be added here as the implementation progresses.

@@ -28,3 +28,19 @@ resources:
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt NotificationsDLQ.Arn
           maxReceiveCount: 3
+
+    # Stores each user's push token so the worker can look it up by userId
+    # (see ADR 0007). On-demand billing means there's no read/write
+    # capacity to provision or tune - the table just scales with however
+    # much traffic actually shows up.
+    PushTokensTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${sls:stage}-push-tokens
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
