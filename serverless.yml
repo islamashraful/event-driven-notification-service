@@ -6,6 +6,30 @@ provider:
   region: ${opt:region, 'eu-central-1'}
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 14
+  # REST API (not the cheaper HTTP API) specifically so the demo API key
+  # is checked at the gateway itself, before a request reaches Lambda -
+  # see ADR 0009. This is a public-demo safeguard, not real
+  # authentication.
+  apiGateway:
+    apiKeys:
+      - ${self:service}-${sls:stage}-key
+
+functions:
+  # Parses, normalizes, and enqueues an incoming event; returns 202 as
+  # soon as it's on the queue (see src/functions/ingest/handler.ts).
+  ingest:
+    handler: src/functions/ingest/handler.handler
+    environment:
+      QUEUE_URL: !Ref NotificationsQueue
+    iamRoleStatements:
+      - Effect: Allow
+        Action: sqs:SendMessage
+        Resource: !GetAtt NotificationsQueue.Arn
+    events:
+      - http:
+          path: /events
+          method: post
+          private: true
 
 resources:
   Resources:
