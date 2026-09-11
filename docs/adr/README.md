@@ -34,5 +34,7 @@ changed — stays visible.
 | [0010](0010-at-least-once-no-idempotency-in-v1.md) | Accept at-least-once delivery; no deduplication in V1 | Accepted |
 | [0011](0011-partial-batch-failure-and-reserved-concurrency.md) | Partial batch failure, plus reserved concurrency as the one concurrency knob | Accepted |
 | [0012](0012-cloudwatch-alarms-for-observability.md) | Native CloudWatch alarms, on three specific signals, over a third-party APM | Accepted |
+| [0013](0013-eventbridge-narrow-role.md) | EventBridge only runs the cleanup cron - it isn't this service's event bus | Accepted |
+| [0014](0014-serverless-v4-built-in-esbuild.md) | Rely on Serverless Framework v4's built-in esbuild, not the serverless-esbuild plugin | Accepted |
 
 More records will be added here as the implementation progresses.
