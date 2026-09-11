@@ -54,6 +54,34 @@ functions:
           method: delete
           private: true
 
+  # Sends the actual push notification for each queued event. Batched and
+  # concurrency-capped so a burst of events gets absorbed by the queue
+  # instead of hammering Expo all at once (see ADR 0006 and
+  # src/functions/process-notification/handler.ts).
+  processNotification:
+    handler: src/functions/process-notification/handler.handler
+    reservedConcurrency: 5
+    # Serverless's default auto-generated role name (built from the
+    # service name, stage, and this function's name) is over IAM's
+    # 64-character limit - shortened here rather than shortening the
+    # service name globally.
+    iam:
+      role:
+        name: ${self:service}-${sls:stage}-notify-role
+    environment:
+      TABLE_NAME: !Ref PushTokensTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource: !GetAtt PushTokensTable.Arn
+    events:
+      - sqs:
+          arn: !GetAtt NotificationsQueue.Arn
+          batchSize: 10
+          functionResponseType: ReportBatchItemFailures
+
 resources:
   Resources:
     # Catches messages the worker keeps failing to process (see ADR 0001
