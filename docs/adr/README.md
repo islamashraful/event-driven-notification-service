@@ -32,5 +32,6 @@ changed — stays visible.
 | [0008](0008-expo-error-mapping-defaults-to-retryable.md) | Unrecognized Expo push errors default to retryable | Accepted |
 | [0009](0009-rest-api-with-gateway-level-api-key.md) | REST API with a gateway-level API key, not a hand-rolled check | Accepted |
 | [0010](0010-at-least-once-no-idempotency-in-v1.md) | Accept at-least-once delivery; no deduplication in V1 | Accepted |
+| [0011](0011-partial-batch-failure-and-reserved-concurrency.md) | Partial batch failure, plus reserved concurrency as the one concurrency knob | Accepted |
 
 More records will be added here as the implementation progresses.
