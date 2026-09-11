@@ -82,6 +82,22 @@ functions:
           batchSize: 10
           functionResponseType: ReportBatchItemFailures
 
+  # Daily sweep that hard-deletes tokens no one's used in 90 days (see
+  # src/functions/cleanup/handler.ts). Runs on its own schedule, not
+  # triggered by any request.
+  cleanup:
+    handler: src/functions/cleanup/handler.handler
+    environment:
+      TABLE_NAME: !Ref PushTokensTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+          - dynamodb:DeleteItem
+        Resource: !GetAtt PushTokensTable.Arn
+    events:
+      - schedule: rate(1 day)
+
 resources:
   Resources:
     # Catches messages the worker keeps failing to process (see ADR 0001
