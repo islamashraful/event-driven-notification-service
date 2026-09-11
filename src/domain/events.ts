@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { ValidationError } from "../shared/errors";
 
 /**
  * What an external backend service actually sends us. No eventId, no
@@ -72,4 +73,27 @@ export function normalizeEvent(request: IncomingEventRequest): NotificationEvent
     eventId: `evt_${randomUUID()}`,
     receivedAt: new Date().toISOString(),
   };
+}
+
+const notificationEventSchema = z.intersection(
+  incomingEventRequestSchema,
+  z.object({
+    eventId: z.string(),
+    receivedAt: z.string(),
+  }),
+);
+
+/**
+ * Validates a message pulled off the queue - the worker's own defense
+ * against a malformed message, independent of `ingest` already having
+ * validated the original request. Throws `ValidationError` rather than
+ * returning a result, since the worker feeds this straight into
+ * `classifyFailure` rather than building an HTTP response.
+ */
+export function parseNotificationEvent(raw: unknown): NotificationEvent {
+  const result = notificationEventSchema.safeParse(raw);
+  if (!result.success) {
+    throw new ValidationError(result.error.message);
+  }
+  return result.data;
 }
