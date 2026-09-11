@@ -30,6 +30,10 @@ export async function registerToken(
 
   if (method === "DELETE") {
     await repository.deactivateToken(userId);
+    // Not a NotificationEvent outcome, so this doesn't go through
+    // src/shared/logger.ts's fixed schema - just a plain structured line,
+    // still picked up by CloudWatch automatically.
+    console.log(JSON.stringify({ task: "registerToken", action: "deactivate", userId }));
     return { statusCode: 200, body: JSON.stringify({ userId, active: false }) };
   }
 
@@ -46,6 +50,7 @@ export async function registerToken(
   }
 
   await repository.saveToken(userId, parsed.data.pushToken, parsed.data.platform);
+  console.log(JSON.stringify({ task: "registerToken", action: "save", userId }));
   return { statusCode: 200, body: JSON.stringify({ userId, active: true }) };
 }
 
