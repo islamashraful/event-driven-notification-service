@@ -135,3 +135,80 @@ resources:
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
+
+    # Alarms below publish here. No email subscription is created - that's
+    # a manual post-deploy step, so a personal address never ends up
+    # committed in this public repo.
+    AlertsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${sls:stage}-alerts
+
+    # Fires if the worker starts erroring - a burst of Errors almost
+    # always means something's actually broken (bad code, a permissions
+    # issue, Expo down), not normal load; the queue/DLQ already absorb
+    # ordinary per-message failures without needing an alarm.
+    ProcessNotificationErrorRateAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-process-notification-errors
+        AlarmDescription: processNotification is erroring - investigate before the DLQ fills up.
+        Namespace: AWS/Lambda
+        MetricName: Errors
+        Dimensions:
+          - Name: FunctionName
+            Value: !Ref ProcessNotificationLambdaFunction
+        Statistic: Sum
+        Period: 300
+        EvaluationPeriods: 1
+        Threshold: 1
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        TreatMissingData: notBreaching
+        AlarmActions:
+          - !Ref AlertsTopic
+
+    # Any message on the DLQ at this scale is worth a look - it means the
+    # worker retried something 3 times (see the queue's RedrivePolicy) and
+    # gave up, not routine noise to tolerate.
+    DLQMessageCountAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-dlq-messages
+        AlarmDescription: A message landed on the DLQ - the worker gave up retrying it.
+        Namespace: AWS/SQS
+        MetricName: ApproximateNumberOfMessagesVisible
+        Dimensions:
+          - Name: QueueName
+            Value: !GetAtt NotificationsDLQ.QueueName
+        Statistic: Maximum
+        Period: 300
+        EvaluationPeriods: 1
+        Threshold: 0
+        ComparisonOperator: GreaterThanThreshold
+        TreatMissingData: notBreaching
+        AlarmActions:
+          - !Ref AlertsTopic
+
+    # Age of the oldest message is the real "are we keeping up" signal -
+    # queue depth alone can look alarming during a normal burst that's
+    # draining fine, but age keeps climbing only if the worker is
+    # genuinely falling behind. 5 minutes is well above normal
+    # processing time at this service's demo scale.
+    QueueAgeAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${sls:stage}-queue-age
+        AlarmDescription: The oldest message on the notifications queue is over 5 minutes old - the worker isn't keeping up.
+        Namespace: AWS/SQS
+        MetricName: ApproximateAgeOfOldestMessage
+        Dimensions:
+          - Name: QueueName
+            Value: !GetAtt NotificationsQueue.QueueName
+        Statistic: Maximum
+        Period: 300
+        EvaluationPeriods: 1
+        Threshold: 300
+        ComparisonOperator: GreaterThanThreshold
+        TreatMissingData: notBreaching
+        AlarmActions:
+          - !Ref AlertsTopic
