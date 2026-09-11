@@ -31,6 +31,29 @@ functions:
           method: post
           private: true
 
+  # PUT saves/replaces a user's push token; DELETE deactivates it. One
+  # function handles both routes rather than splitting into two Lambdas
+  # for a trivial method branch (see src/functions/register-token/handler.ts).
+  registerToken:
+    handler: src/functions/register-token/handler.handler
+    environment:
+      TABLE_NAME: !Ref PushTokensTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+        Resource: !GetAtt PushTokensTable.Arn
+    events:
+      - http:
+          path: /users/{id}/push-token
+          method: put
+          private: true
+      - http:
+          path: /users/{id}/push-token
+          method: delete
+          private: true
+
 resources:
   Resources:
     # Catches messages the worker keeps failing to process (see ADR 0001
